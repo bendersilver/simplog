@@ -22,6 +22,7 @@ const (
 	DEBUG
 )
 
+var maxlvl = DEBUG
 var file = os.Stdout
 
 // auto init path
@@ -40,6 +41,9 @@ func init() {
 }
 
 func write(lv lvl, s string) {
+	if maxlvl < lv {
+		return
+	}
 	switch lv {
 	case CRITICAL:
 		file.WriteString("\033[35mC ")
@@ -127,6 +131,11 @@ func Fatalf(format string, a ...interface{}) {
 // Close -
 func Close() {
 	file.Close()
+}
+
+// SetMaxLevel - set loggin max level
+func SetMaxLevel(l lvl) {
+	maxlvl = l
 }
 
 // SetPath - set path loller file
