@@ -23,7 +23,7 @@ const (
 )
 
 var maxlvl = DEBUG
-var file = os.Stdout
+var file = os.Stderr
 
 // auto init path
 func init() {
@@ -31,6 +31,7 @@ func init() {
 	if err != nil {
 		return
 	}
+	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		spl := strings.Split(scanner.Text(), "=")
