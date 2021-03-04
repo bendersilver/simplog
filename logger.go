@@ -1,6 +1,7 @@
 package simplog
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path"
@@ -22,6 +23,21 @@ const (
 )
 
 var file = os.Stdout
+
+// auto init path
+func init() {
+	f, err := os.OpenFile("./.env", os.O_RDONLY, 0644)
+	if err != nil {
+		return
+	}
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		spl := strings.Split(scanner.Text(), "=")
+		if len(spl) > 1 && spl[0] == "LOG_PATH" {
+			SetPath(spl[1])
+		}
+	}
+}
 
 func write(lv lvl, s string) {
 	switch lv {
