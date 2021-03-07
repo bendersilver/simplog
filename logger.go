@@ -131,9 +131,9 @@ func Fatalf(format string, a ...interface{}) {
 }
 
 // Recover -
-func Recover() {
+func Recover(e *error) {
 	if err := recover(); err != nil {
-		write(LvlCRITICAL, fmt.Sprintf("\033[31m%v\033[0m\n%s", err, debug.Stack()), 2)
+		*e = fmt.Errorf("%v\n%s", err, debug.Stack())
 	}
 }
 
