@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"time"
 )
@@ -14,15 +15,15 @@ type lvl int
 
 // Log levels.
 const (
-	CRITICAL lvl = iota
-	ERROR
-	WARNING
-	NOTICE
-	INFO
-	DEBUG
+	LvlCRITICAL lvl = iota
+	LvlERROR
+	LvlWARNING
+	LvlNOTICE
+	LvlINFO
+	LvlDEBUG
 )
 
-var maxlvl = DEBUG
+var maxlvl = LvlDEBUG
 var file = os.Stderr
 
 // auto init path
@@ -41,22 +42,22 @@ func init() {
 	}
 }
 
-func write(lv lvl, s string) {
+func write(lv lvl, s string, skip int) {
 	if maxlvl < lv {
 		return
 	}
 	switch lv {
-	case CRITICAL:
+	case LvlCRITICAL:
 		file.WriteString("\033[35mC ")
-	case ERROR:
+	case LvlERROR:
 		file.WriteString("\033[31mE ")
-	case WARNING:
+	case LvlWARNING:
 		file.WriteString("\033[33mW ")
-	case NOTICE:
+	case LvlNOTICE:
 		file.WriteString("\033[32mN ")
-	case INFO:
+	case LvlINFO:
 		file.WriteString("\033[37mI ")
-	case DEBUG:
+	case LvlDEBUG:
 		file.WriteString("\033[36mD ")
 	}
 	file.WriteString(time.Now().Format("2006-01-02 15:04:05.999"))
@@ -67,66 +68,73 @@ func write(lv lvl, s string) {
 
 // Debug -
 func Debug(v ...interface{}) {
-	write(DEBUG, fmt.Sprintln(v...))
+	write(LvlDEBUG, fmt.Sprintln(v...), 2)
 }
 
 // Debugf -
 func Debugf(format string, a ...interface{}) {
-	write(DEBUG, fmt.Sprintf(format, a...))
+	write(LvlDEBUG, fmt.Sprintf(format, a...), 2)
 }
 
 // Info -
 func Info(v ...interface{}) {
-	write(INFO, fmt.Sprintln(v...))
+	write(LvlINFO, fmt.Sprintln(v...), 2)
 }
 
 // Infof -
 func Infof(format string, a ...interface{}) {
-	write(INFO, fmt.Sprintf(format, a...))
+	write(LvlINFO, fmt.Sprintf(format, a...), 2)
 }
 
 // Notice -
 func Notice(v ...interface{}) {
-	write(NOTICE, fmt.Sprintln(v...))
+	write(LvlNOTICE, fmt.Sprintln(v...), 2)
 }
 
 // Noticef -
 func Noticef(format string, a ...interface{}) {
-	write(NOTICE, fmt.Sprintf(format, a...))
+	write(LvlNOTICE, fmt.Sprintf(format, a...), 2)
 }
 
 // Warning -
 func Warning(v ...interface{}) {
-	write(WARNING, fmt.Sprintln(v...))
+	write(LvlWARNING, fmt.Sprintln(v...), 2)
 }
 
 // Warningf -
 func Warningf(format string, a ...interface{}) {
-	write(WARNING, fmt.Sprintf(format, a...))
+	write(LvlWARNING, fmt.Sprintf(format, a...), 2)
 }
 
 // Error -
 func Error(v ...interface{}) {
-	write(ERROR, fmt.Sprintln(v...))
+	write(LvlERROR, fmt.Sprintln(v...), 2)
 }
 
 // Errorf -
 func Errorf(format string, a ...interface{}) {
-	write(ERROR, fmt.Sprintf(format, a...))
+	write(LvlERROR, fmt.Sprintf(format, a...), 2)
 }
 
 // Fatal -
 func Fatal(v ...interface{}) {
-	write(CRITICAL, fmt.Sprintln(v...))
+	write(LvlCRITICAL, fmt.Sprintln(v...), 2)
 	file.Close()
 	os.Exit(1)
 }
 
 // Fatalf -
 func Fatalf(format string, a ...interface{}) {
-	write(CRITICAL, fmt.Sprintf(format, a...))
+	write(LvlCRITICAL, fmt.Sprintf(format, a...), 2)
 	file.Close()
 	os.Exit(1)
+}
+
+// Recover -
+func Recover() {
+	if err := recover(); err != nil {
+		write(LvlCRITICAL, fmt.Sprintf("\033[31m%v\033[0m\n%s", err, debug.Stack()), 2)
+	}
 }
 
 // Close -
