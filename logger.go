@@ -30,7 +30,7 @@ var file = os.Stderr
 func init() {
 	var f *os.File
 	var err error
-	, _ := os.Executable()
+	exe, _ := os.Executable()
 	var pth = []string{"./", path.Dir(os.Args[0]), exe}
 	for _, p := range pth {
 		f, err = os.OpenFile(path.Join(p, ".env"), os.O_RDONLY, 0644)
